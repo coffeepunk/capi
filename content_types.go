@@ -113,7 +113,7 @@ func (ct *ContentType) List() ContentTypeCollection {
 	return collection
 }
 
-func (ct ContentType) Create(contentData string) ContentType {
+func (ct *ContentType) Create(contentData string) ContentType {
 	ep := fmt.Sprintf("/spaces/%s/environments/%s/content_types", ct.client.SpaceID, ct.client.Environment)
 
 	resp := ct.client.call("POST", ep, []byte(contentData))
@@ -127,7 +127,7 @@ func (ct ContentType) Create(contentData string) ContentType {
 	return contentType
 }
 
-func (ct ContentType) Activate(contentID string, version int) ContentType {
+func (ct *ContentType) Activate(contentID string, version int) ContentType {
 	v := strconv.Itoa(version)
 	ep := fmt.Sprintf("/spaces/%s/environments/%s/content_types/%s/published", ct.client.SpaceID, ct.client.Environment, contentID)
 
