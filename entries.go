@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	"strconv"
 	"time"
 )
 
@@ -12,10 +11,10 @@ type EntriesCollection struct {
 	Sys struct {
 		Type string `json:"type"`
 	} `json:"sys"`
-	Total int `json:"total"`
-	Skip  int `json:"skip"`
-	Limit int `json:"limit"`
-	Items []Entry `json:"items"`
+	Total    int     `json:"total"`
+	Skip     int     `json:"skip"`
+	Limit    int     `json:"limit"`
+	Items    []Entry `json:"items"`
 	Includes struct {
 		Entry []Entry
 		Asset []Asset
@@ -23,8 +22,7 @@ type EntriesCollection struct {
 }
 
 type Entry struct {
-	client cmaClient
-	Sys struct {
+	Sys    struct {
 		Space struct {
 			Sys struct {
 				Type     string `json:"type"`
@@ -76,57 +74,48 @@ type Entry struct {
 				ID       string `json:"id"`
 			} `json:"sys"`
 		} `json:"contentType"`
+		Locale string `json:"locale"`
 	} `json:"sys"`
 	Fields map[string]interface{} `json:"fields"`
 }
-
-func NewEntry(client cmaClient) Entry {
-	var e Entry
-	e.client = client
-	return e
+func entriesEndpoint(spaceID, environment string) string {
+	return fmt.Sprintf("/spaces/%s/environments/%s/entries", spaceID, environment)
 }
 
-func (e *Entry) List() EntriesCollection {
-	ep := fmt.Sprintf("/spaces/%s/environments/%s/entries", e.client.SpaceID, e.client.Environment)
-	resp := e.client.call("GET", ep, nil)
+func (cda *CDA) GetEntry(entryID string) Entry {
+	ep := entriesEndpoint(cda.SpaceID, cda.Environment)
+	ep = fmt.Sprintf("%s/%s", ep, entryID)
+	resp, err := cda.client.call("GET", ep, nil)
+	if err != nil {
+		log.Println(err)
+	}
+
+	var entry Entry
+	body := readRequestBody(resp.Body)
+
+	if err := json.Unmarshal(body, &entry); err != nil {
+		log.Panic("Could not unmarshal entry", err)
+	}
+
+	return entry
+}
+
+func (cda *CDA) GetEntries(params SearchParameters) EntriesCollection {
+	ep := entriesEndpoint(cda.SpaceID, cda.Environment)
+	qs := buildQueryString(params)
+
+	ep = fmt.Sprintf("%s?%s", ep, qs)
+	resp, err := cda.client.call("GET", ep, nil)
+	if err != nil {
+		log.Println(err)
+	}
 
 	var collection EntriesCollection
 	body := readRequestBody(resp.Body)
 
 	if err := json.Unmarshal(body, &collection); err != nil {
-		log.Panic("Could not unmarshal fields in list entries", err)
+		log.Panic("Could not unmarshal entries in GetEntries", err)
 	}
 
 	return collection
-}
-
-func (e *Entry) Create(entryData, contentTypeID string) Entry {
-	ep := fmt.Sprintf("/spaces/%s/environments/%s/entries", e.client.SpaceID, e.client.Environment)
-	e.client.addHeader("X-Contentful-Content-Type", contentTypeID)
-
-	resp := e.client.call("POST", ep, []byte(entryData))
-	body := readRequestBody(resp.Body)
-
-	var entry Entry
-	if err := json.Unmarshal(body, &entry); err != nil {
-		log.Panic("Could not unmarshal fields for creating a Content Type", err)
-	}
-
-	return entry
-}
-
-func (e *Entry) Publish(entryID string, version int) Entry {
-	v := strconv.Itoa(version)
-	ep := fmt.Sprintf("/spaces/%s/environments/%s/entries/%s/published", e.client.SpaceID, e.client.Environment, entryID)
-
-	e.client.addHeader("X-Contentful-Version", v)
-	resp := e.client.call("PUT", ep, nil)
-	body := readRequestBody(resp.Body)
-
-	var entry Entry
-	if err := json.Unmarshal(body, &entry); err != nil {
-		log.Panic("Could not unmarshal fields for publish Entry", err)
-	}
-
-	return entry
 }
