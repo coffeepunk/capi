@@ -1,4 +1,4 @@
-module capi
+module github.com/coffeepunk/capi
 
 go 1.14
 
