@@ -100,22 +100,21 @@ func (cda *CDA) GetEntry(entryID string) Entry {
 	return entry
 }
 
-func (cda *CDA) GetEntries(params SearchParameters) EntriesCollection {
+func (cda *CDA) GetEntries(params SearchParameters) (EntriesCollection, error) {
+	var collection EntriesCollection
 	ep := entriesEndpoint(cda.SpaceID, cda.Environment)
 	qs := buildQueryString(params)
 
 	ep = fmt.Sprintf("%s?%s", ep, qs)
 	resp, err := cda.client.call("GET", ep, nil)
 	if err != nil {
-		log.Println(err)
+		return collection, err
 	}
 
-	var collection EntriesCollection
 	body := readRequestBody(resp.Body)
-
 	if err := json.Unmarshal(body, &collection); err != nil {
 		log.Panic("Could not unmarshal entries in GetEntries", err)
 	}
 
-	return collection
+	return collection, nil
 }

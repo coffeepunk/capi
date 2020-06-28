@@ -6,6 +6,7 @@ import (
 )
 
 type SearchParameters struct {
+	EntryID     string `url:"sys.id"`
 	ContentType string `url:"content_type"`
 	Include     string `url:"include"`
 	Limit       string `url:"limit"`
@@ -17,6 +18,10 @@ type SearchParameters struct {
 func buildQueryString(params SearchParameters) string {
 	qs := url.Values{}
 	qs.Add("include", "2")
+
+	if params.EntryID != "" {
+		qs.Add("sys.id", params.EntryID)
+	}
 
 	if params.ContentType != "" {
 		qs.Add("content_type", params.ContentType)
@@ -44,9 +49,13 @@ func buildQueryString(params SearchParameters) string {
 
 	queryString := qs.Encode()
 	if params.Fields != "" {
-		queryString = strings.ReplaceAll(queryString,"fields=", "fields.")
-		queryString = strings.ReplaceAll(queryString,"%3D", "=")
+		queryString = strings.ReplaceAll(queryString, "fields=", "fields.")
+		queryString = strings.ReplaceAll(queryString, "%3D", "=")
 	}
 
 	return queryString
+}
+
+func (cda *CDA) SearchParams() SearchParameters {
+	return SearchParameters{}
 }
