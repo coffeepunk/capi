@@ -1,6 +1,6 @@
 package capi
 
-var CONFIG = Config{
+var TESTCONFIG = Config{
 	AccessToken:    "1234",
 	SpaceID:        "abcdef",
 	Environment:    "master",

@@ -3,10 +3,10 @@ package capi
 import "testing"
 
 func TestNewCMA(t *testing.T) {
-	cma := NewCMA(CONFIG)
+	cma := NewCMA(TESTCONFIG)
 
-	if cma.Environment != CONFIG.Environment {
-		t.Errorf("Environment does not match config, got %s, wanted %s", cma.Environment, CONFIG.Environment)
+	if cma.Environment != TESTCONFIG.Environment {
+		t.Errorf("Environment does not match config, got %s, wanted %s", cma.Environment, TESTCONFIG.Environment)
 	}
 
 	if cma.Api != "CMA" {

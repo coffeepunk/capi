@@ -4,7 +4,7 @@ import "fmt"
 
 type CMA struct {
 	Api string
-	client
+	Client
 }
 
 func NewCMA(config Config) CMA {
@@ -17,8 +17,8 @@ func NewCMA(config Config) CMA {
 	cma.baseUrl = "https://api.contentful.com"
 	cma.Api = "CMA"
 
-	cma.client.addHeader("Authorization", bearer)
-	cma.addHeader("X-Contentful-Organization", config.OrganisationID)
-	cma.addHeader("Content-Type", "application/vnd.contentful.management.v1+json")
+	cma.Client.AddHeader("Authorization", bearer)
+	cma.AddHeader("X-Contentful-Organization", config.OrganisationID)
+	cma.AddHeader("Content-Type", "application/vnd.contentful.management.v1+json")
 	return cma
 }

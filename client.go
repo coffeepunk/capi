@@ -9,60 +9,19 @@ import (
 	"strings"
 )
 
-type client struct {
+type Client struct {
 	Config
-	headers []header
+	headers []Header
 	baseUrl string
 }
 
-type header struct {
+type Header struct {
 	key   string
 	value string
 }
 
-/*
-func Open(config Config) Connection {
-	bearer := fmt.Sprintf("Bearer %s", config.AccessToken)
-
-	var conn Connection
-	conn.CDA.SpaceID = config.SpaceID
-	conn.CDA.Environment = config.Environment
-	conn.CDA.AccessToken = config.AccessToken
-	conn.CDA.baseUrl = getBaseUrl("CDA")
-	conn.CDA.addHeader("Authorization", bearer)
-
-	conn.CMA.SpaceID = config.SpaceID
-	conn.CMA.Environment = config.Environment
-	conn.CMA.AccessToken = config.AccessToken
-	conn.CMA.baseUrl = getBaseUrl("CMA")
-	conn.CMA.addHeader("Authorization", bearer)
-	conn.CMA.addHeader("X-Contentful-Organization", config.OrganisationID)
-	conn.CMA.addHeader("Content-Type", "application/vnd.contentful.management.v1+json")
-
-	return conn
-}
-
-func getBaseUrl(api string) string {
-	var url string
-	switch api {
-	case "CDN":
-		url = "https://cdn.contentful.com"
-	case "CPA":
-		url = "https://preview.contentful.com"
-	case "CMA":
-		url = "https://api.contentful.com"
-	case "IA":
-		url = "https://images.ctfassets.net"
-	default:
-		url = "https://cdn.contentful.com"
-	}
-
-	return url
-}
-*/
-
-func (c *client) addHeader(key, value string) {
-	h := header{
+func (c *Client) AddHeader(key, value string) {
+	h := Header{
 		key:   key,
 		value: value,
 	}
@@ -81,7 +40,7 @@ func readRequestBody(requestBody io.ReadCloser) []byte {
 	return body
 }
 
-func (c *client) call(method, endpoint string, body []byte) (*http.Response, error) {
+func (c *Client) call(method, endpoint string, body []byte) (*http.Response, error) {
 	verb := strings.ToUpper(method)
 	url := fmt.Sprintf("%s%s", c.baseUrl, endpoint)
 	req, err := http.NewRequest(verb, url, bytes.NewReader(body))

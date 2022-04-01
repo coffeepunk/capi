@@ -22,7 +22,7 @@ type EntriesCollection struct {
 }
 
 type Entry struct {
-	Sys    struct {
+	Sys struct {
 		Space struct {
 			Sys struct {
 				Type     string `json:"type"`
@@ -78,6 +78,7 @@ type Entry struct {
 	} `json:"sys"`
 	Fields map[string]interface{} `json:"fields"`
 }
+
 func entriesEndpoint(spaceID, environment string) string {
 	return fmt.Sprintf("/spaces/%s/environments/%s/entries", spaceID, environment)
 }
@@ -85,7 +86,7 @@ func entriesEndpoint(spaceID, environment string) string {
 func (cda *CDA) GetEntry(entryID string) Entry {
 	ep := entriesEndpoint(cda.SpaceID, cda.Environment)
 	ep = fmt.Sprintf("%s/%s", ep, entryID)
-	resp, err := cda.client.call("GET", ep, nil)
+	resp, err := cda.Client.call("GET", ep, nil)
 	if err != nil {
 		log.Println(err)
 	}
@@ -106,7 +107,7 @@ func (cda *CDA) GetEntries(params SearchParameters) (EntriesCollection, error) {
 	qs := buildQueryString(params)
 
 	ep = fmt.Sprintf("%s?%s", ep, qs)
-	resp, err := cda.client.call("GET", ep, nil)
+	resp, err := cda.Client.call("GET", ep, nil)
 	if err != nil {
 		return collection, err
 	}
